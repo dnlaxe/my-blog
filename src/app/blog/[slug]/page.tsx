@@ -33,21 +33,25 @@ export default async function BlogPostPage({
       content={post.content.map((block, index) => {
         switch (block.type) {
           case 'header':
-            return <h1 key={index}>{block.text}</h1>;
+            return <h1 key={index} className="post-header">{block.text}</h1>;
           case 'paragraph':
-            return <p key={index}>{block.text}</p>;
+            return <p key={index} className="post-paragraph">{block.text}</p>;
           case 'code':
             return (
-              <pre key={index}>
-                {block.filename && <div>{block.filename}</div>}
-                <code>{block.code}</code>
-              </pre>
+              <div key={index} className="post-code-block">
+                {block.filename && (
+                  <div className="code-filename">{block.filename}</div>
+                )}
+                <pre className="post-code">
+                  <code>{block.code}</code>
+                </pre>
+              </div>
             );
           case 'list':
             return (
-              <ul key={index}>
+              <ul key={index} className="post-list">
                 {(block.items ?? []).map((item, i) => (
-                  <li key={i}>{item}</li>
+                  <li key={i} className="post-list-item">{item}</li>
                 ))}
               </ul>
             );
