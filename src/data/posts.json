@@ -645,12 +645,6 @@
       "text": "Dynamic Routing via Slug"
     },
     {
-      "type": "code",
-      "language": "ts",
-      "filename": "page.tsx",
-      "code": "type Params = {\n  params: {\n    slug: string;\n  };\n};"
-    },
-    {
       "type": "list",
       "items": [
         "The slug value comes from the URL path: /blog/my-post-id.",
