@@ -1,6 +1,8 @@
-import '../../../styles/globals.css';
+// src/app/blog/[slug]/page.tsx
+
 import posts from '../../../data/posts.json';
 import BlogPostContent from '../../../components/BlogPostContent';
+import '../../../styles/globals.css';
 
 type ParagraphBlock = {
   type: 'paragraph';
@@ -35,16 +37,9 @@ type Post = {
   content: PostBlock[];
 };
 
-interface PageProps {
-  params: {
-    slug: string;
-  };
-}
-
-export default async function BlogPostPage({ params }: PageProps) {
-  const { slug } = params;
-
-  const post = posts.find(p => p.id === slug) as Post | undefined;
+// ✅ THIS is the correct signature for dynamic routes in Next.js App Router
+export default async function Page({ params }: { params: { slug: string } }) {
+  const post = posts.find(p => p.id === params.slug) as Post | undefined;
 
   if (!post) {
     return <div>Post not found.</div>;
