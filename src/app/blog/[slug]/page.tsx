@@ -1,8 +1,7 @@
-// src/app/blog/[slug]/page.tsx
-
+import '../../../styles/globals.css';
 import posts from '../../../data/posts.json';
 import BlogPostContent from '../../../components/BlogPostContent';
-import '../../../styles/globals.css';
+
 
 type ParagraphBlock = {
   type: 'paragraph';
@@ -37,47 +36,61 @@ type Post = {
   content: PostBlock[];
 };
 
-// ✅ THIS is the correct signature for dynamic routes in Next.js App Router
-export default async function Page({ params }: { params: { slug: string } }) {
-  const post = posts.find(p => p.id === params.slug) as Post | undefined;
+type Params = {
+  params: {
+    slug: string;
+  };
+};
+
+interface PageProps {
+  params: {
+    slug: string;
+  };
+}
+
+export default async function BlogPostPage({ params }: PageProps) {
+  const { slug } = params;
+
+  const post = posts.find(p => p.id === slug) as Post | undefined;
 
   if (!post) {
     return <div>Post not found.</div>;
   }
 
-  return (
-    <BlogPostContent
-      title={post.title}
-      date={post.date}
-      content={post.content.map((block, index) => {
-        switch (block.type) {
-          case 'header':
-            return <h1 key={index} className="post-header">{block.text}</h1>;
-          case 'paragraph':
-            return <p key={index} className="post-paragraph">{block.text}</p>;
-          case 'code':
-            return (
-              <div key={index} className="post-code-block">
-                {block.filename && (
-                  <div className="code-filename">{block.filename}</div>
-                )}
-                <pre className="post-code">
-                  <code>{block.code}</code>
-                </pre>
-              </div>
-            );
-          case 'list':
-            return (
-              <ul key={index} className="post-list">
-                {(block.items ?? []).map((item, i) => (
-                  <li key={i} className="post-list-item">{item}</li>
-                ))}
-              </ul>
-            );
-          default:
-            return null;
-        }
-      })}
-    />
-  );
+return (
+  <BlogPostContent
+    title={post.title}
+    date={post.date}
+    content={post.content.map((block, index) => {
+      switch (block.type) {
+        case 'header':
+          return <h1 key={index} className="post-header">{block.text}</h1>;
+        case 'paragraph':
+          return <p key={index} className="post-paragraph">{block.text}</p>;
+        case 'code':
+          return (
+            <div key={index} className="post-code-block">
+              {block.filename && (
+                <div className="code-filename">{block.filename}</div>
+              )}
+              <pre className="post-code">
+                <code>{block.code}</code>
+              </pre>
+            </div>
+          );
+        case 'list':
+          return (
+            <ul key={index} className="post-list">
+              {(block.items ?? []).map((item, i) => (
+                <li key={i} className="post-list-item">{item}</li>
+              ))}
+            </ul>
+          );
+        default:
+          return null;
+      }
+    })}
+  />
+);
+
 }
