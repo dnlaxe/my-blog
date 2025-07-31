@@ -1,0 +1,1103 @@
+[
+    {
+  "id": "nextjs-blog-foundation",
+  "title": "How I Plan to Build the Foundation for This Blog",
+  "category": "Development",
+  "date": "2025-07-29",
+  "summary": "A clear plan for building a modular, JSON-powered blog using Next.js with App Router — no CMS, no database, just clean structure and full control.",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "I’m setting out to build a clean, simple, and scalable blog using Next.js with the App Router. I want full control over the structure and styling — without a CMS or database — and a system that’s easy to extend later with new features like search, tags, or pagination."
+    },
+    {
+      "type": "header",
+      "text": "Project Structure + Layout Goals"
+    },
+    {
+      "type": "paragraph",
+      "text": "I'll be starting with a clear structure for maintainability:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "A RootLayout component to wrap the entire site — defining global HTML, body, header, and font styles.",
+        "A separate BlogLayout for pages under /blog that includes a persistent category navigation bar.",
+        "Clean, semantic HTML with shared components like <Navbar /> and <CategoryNav />."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Everything should feel cohesive across the site."
+    },
+    {
+      "type": "header",
+      "text": "Data-Driven Content Using JSON"
+    },
+    {
+      "type": "paragraph",
+      "text": "Instead of a backend, I’ll manage all blog content inside a posts.json file. Each post will include:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "id, title, category, date, and summary",
+        "A flexible content[] array for blocks like: paragraphs, headers, code snippets (with language and filename), and bullet lists"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This approach keeps the content portable, editable, and version-controlled — with the power to render each block dynamically based on type."
+    },
+    {
+      "type": "header",
+      "text": "Planned Features"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Blog List Page at /blog : Renders all posts as cards. Each card links to a dynamic detail page.",
+        "Category Filtering: A CategoryNav component that generates links from posts.json. Clicking a category filters posts client-side via query parameters.",
+        "Dynamic Post Pages: Located at /blog/[slug]. Each page pulls its content from posts.json by matching the id. Renders paragraphs, headers, code blocks (with filenames), and bullet lists.",
+        "Global Styling: A custom globals.css reset using @layer reset. Consistent typography, spacing, and layout. Dark/light mode support later down the line."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Why This Stack"
+    },
+    {
+      "type": "list",
+      "items": [
+        "I want to own my content — no CMS lock-in",
+        "Next.js App Router supports file-based layouts and dynamic routes out of the box",
+        "Using static JSON means I can deploy this as a fully static site — fast and hostable anywhere",
+        "Everything is modular and component-driven — easy to update and scale"
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Summary of My Plan"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Set up a basic blog shell with layout and navigation",
+        "Store and render posts from static JSON",
+        "Build category filtering and dynamic routing",
+        "Style everything with a global CSS layer",
+        "Keep it simple and scalable"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "I’ll be documenting each step as I go. Once the basics are working, I’ll start exploring improvements."
+    }
+  ]
+}
+,
+{
+  "id": "full-blog-foundation-guide",
+  "title": "How I Built the Foundation for This Blog (Full Guide)",
+  "category": "Development",
+  "date": "2025-07-29",
+  "summary": "A comprehensive guide showing how this blog was built using Next.js App Router, dynamic routing, category filtering, global styles, and structured content via JSON.",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "This file sets up the root layout for my blog using Next.js App Router. It wraps all pages in a consistent layout with shared styles, fonts, and components like the Navbar."
+    },
+    {
+      "type": "header",
+      "text": "Global Styles + Fonts"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "layout.tsx",
+      "code": "import '../styles/globals.css';\nimport { Roboto } from 'next/font/google';"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Imports a global CSS file that applies consistent styles across the site.",
+        "Loads the Roboto font from Google Fonts with weights 400 and 700.",
+        "Applies it as a CSS variable (--font-roboto) for easy usage in styling."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Shared Layout Elements"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "layout.tsx",
+      "code": "import Navbar from '../components/NavBar';\nimport Link from 'next/link';"
+    },
+    {
+      "type": "list",
+      "items": [
+        "The Navbar component is imported and displayed across all pages.",
+        "Link from Next.js handles client-side navigation."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Page Metadata"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "layout.tsx",
+      "code": "export const metadata = {\n  title: 'My Blog',\n  description: 'A simple blog with category filtering',\n};"
+    },
+    {
+      "type": "paragraph",
+      "text": "This sets the default title and description for SEO and social sharing."
+    },
+    {
+      "type": "header",
+      "text": "HTML Structure"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "layout.tsx",
+      "code": "export default function RootLayout({ children }: { children: ReactNode }) {\n  return (\n    <html lang=\"en\" className={roboto.variable}>\n      <body className=\"main-body\">\n        <header className=\"site-header\">\n          <Link href=\"/\" className=\"site-title-link\">\n            <h4 className=\"site-title\">Name of blog</h4>\n          </Link>\n          <Navbar />\n        </header>\n        <main>{children}</main>\n      </body>\n    </html>\n  );\n}"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Applies the Roboto font class to the <html> element.",
+        "Displays a site title link and the Navbar at the top of every page.",
+        "Renders the page-specific content inside <main> using the children prop."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This RootLayout acts as the skeleton for my blog. Every page inherits this structure, making it easy to maintain a unified design and navigation experience."
+    },
+    {
+      "type": "header",
+      "text": "Styling Foundation for My Blog: globals.css"
+    },
+    {
+      "type": "paragraph",
+      "text": "This file sets the global styles and resets for the entire blog. It ensures consistent appearance across different browsers, defines some root variables, and handles basic accessibility and layout concerns."
+    },
+    {
+      "type": "header",
+      "text": "CSS Reset (Using @layer reset)"
+    },
+    {
+      "type": "code",
+      "language": "css",
+      "filename": "globals.css",
+      "code": "@layer reset {\n  *, *::before, *::after {\n    box-sizing: border-box;\n  }\n\n  * {\n    margin: 0;\n    padding: 0;\n  }\n\n  html {\n    font-size: 16px;\n  }\n\n  body {\n    font-family: monospace;\n    line-height: 1.6;\n    -webkit-font-smoothing: antialiased;\n    -moz-osx-font-smoothing: grayscale;\n  }\n\n  img, picture, video, canvas, svg {\n    display: block;\n    max-width: 100%;\n  }\n\n  input, button, textarea, select {\n    font: inherit;\n  }\n\n  p, h1, h2, h4, h5, h6 {\n    overflow-wrap: break-word;\n  }\n\n  p {\n    text-wrap: pretty;\n  }\n\n  h1, h2, h4, h5, h6 {\n    text-wrap: balance;\n  }\n\n  #root, #__next {\n    isolation: isolate;\n  }\n}"
+    },
+    {
+      "type": "header",
+      "text": "CSS Variables (Theme)"
+    },
+    {
+      "type": "code",
+      "language": "css",
+      "filename": "globals.css",
+      "code": ":root {\n  --background: white;\n  --foreground: black;\n  --accent: grey;\n}"
+    },
+    {
+      "type": "header",
+      "text": "HTML + Body Styles"
+    },
+    {
+      "type": "code",
+      "language": "css",
+      "filename": "globals.css",
+      "code": "html, body {\n  height: 100%;\n  overflow: hidden;\n}\n\nbody {\n  overflow-y: auto;\n  color: var(--foreground);\n  background: var(--background);\n  font-family: var(--font-roboto);\n}"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Ensures the entire page takes full height.",
+        "Enables vertical scrolling but hides horizontal overflow.",
+        "Sets a large base font size for readability.",
+        "Applies font smoothing and custom font (like roboto, if imported)."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Link Styles"
+    },
+    {
+      "type": "code",
+      "language": "css",
+      "filename": "globals.css",
+      "code": "a {\n  color: inherit;\n  text-decoration: none;\n}"
+    },
+    {
+      "type": "paragraph",
+      "text": "Links will inherit surrounding text color and remove the default underline—this keeps styling clean and consistent with the design."
+    },
+    {
+      "type": "paragraph",
+      "text": "This file gives my blog a clean, consistent baseline for styling and makes it easier to scale design changes later."
+    },
+    {
+      "type": "header",
+      "text": "A Simple, Dynamic Navigation Bar - Navbar.tsx"
+    },
+    {
+      "type": "paragraph",
+      "text": "This component creates a responsive and active-aware navigation menu for the blog using Next.js App Router:"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "Navbar.tsx",
+      "code": "'use client';\n\nimport Link from 'next/link';\nimport { usePathname } from 'next/navigation';\n\nconst links = [\n  { href: '/blog', label: 'Blog' },\n  { href: '/portfolio', label: 'Portfolio' },\n  { href: '/about', label: 'About' }\n];"
+    },
+    {
+      "type": "header",
+      "text": "Key Features"
+    },
+    {
+      "type": "list",
+      "items": [
+        "The 'use client' directive tells Next.js this component is client-side rendered, enabling use of hooks like usePathname().",
+        "The links array defines navigation routes and their display labels."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Active Link Highlighting"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "Navbar.tsx",
+      "code": "const pathname = usePathname();"
+    },
+    {
+      "type": "paragraph",
+      "text": "usePathname() retrieves the current URL path."
+    },
+    {
+      "type": "list",
+      "items": [
+        "This helps dynamically style the active link (the one matching the current route)."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Rendered HTML"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "Navbar.tsx",
+      "code": "<nav>\n  <ul className=\"navbar-list\">\n    {links.map(link => {\n      const isActive = pathname.startsWith(link.href);\n      return (\n        <li key={link.href}>\n          <Link\n            href={link.href}\n            className={`navbar-link ${isActive ? 'active' : ''}`}\n          >\n            {link.label}\n          </Link>\n        </li>\n      );\n    })}\n  </ul>\n</nav>"
+    },
+    {
+      "type": "list",
+      "items": [
+        "The links are rendered inside a <ul> for accessibility and structure.",
+        "If a link matches the current route (pathname.startsWith(link.href)), it gets an active class for visual styling (e.g., highlight or underline).",
+        "This makes the user experience smoother and more intuitive."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This Navbar ensures clean navigation with real-time active link feedback and is easily extendable as the site grows."
+    },
+        {
+      "type": "header",
+      "text": "Blog Section Layout with Category Navigation: blog/layout.tsx – "
+    },
+    {
+      "type": "paragraph",
+      "text": "This layout defines the shared structure for all pages inside the /blog route. It wraps blog content with a persistent CategoryNav component to enable category-based navigation across all blog-related pages."
+    },
+    {
+      "type": "header",
+      "text": "✍️ Code Overview"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "layout.tsx",
+      "code": "import { ReactNode } from 'react';\nimport CategoryNav from '../../components/CategoryNav';"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Imports the CategoryNav component, which will render a list of category links (e.g., Tech, Design, etc.).",
+        "Uses ReactNode to type the children prop, allowing this layout to wrap any child components."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Metadata"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "layout.tsx",
+      "code": "export const metadata = {\n  title: 'Blog | My Blog',\n  description: 'Browse posts by category',\n};"
+    },
+    {
+      "type": "paragraph",
+      "text": "Defines SEO metadata specifically for the blog section."
+    },
+    {
+      "type": "header",
+      "text": "Layout Structure"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "layout.tsx",
+      "code": "export default function BlogLayout({ children }: { children: ReactNode }) {\n  return (\n    <section>\n      <CategoryNav />\n      <div>{children}</div>\n    </section>\n  );\n}"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Renders the CategoryNav at the top of the blog layout.",
+        "Wraps the actual blog content (children) underneath it.",
+        "This layout ensures that every blog page (e.g., post list, post detail) shares the same category navigation structure."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This post explains how I made a simple navigation bar that highlights the current page using Next.js. It also shows how I set up a blog layout with a category menu that appears on every blog page."
+    },
+    {
+      "type": "header",
+      "text": "Blog Post Data Format: posts.json – "
+    },
+    {
+      "type": "paragraph",
+      "text": "This file defines the structure of each blog post using a clean, portable JSON format. It supports rich content types and drives the frontend display dynamically."
+    },
+    {
+      "type": "header",
+      "text": "Sample Post Structure"
+    },
+    {
+      "type": "code",
+      "language": "json",
+      "filename": "posts.json",
+      "code": "{\n  \"id\": \"unique-post-id\",\n  \"title\": \"Title of the Blog Post\",\n  \"category\": \"CategoryName\",\n  \"date\": \"YYYY-MM-DD\",\n  \"summary\": \"A brief summary of the blog post.\",\n  \"content\": [\n    { \"type\": \"header\", \"text\": \"Section Title\" },\n    { \"type\": \"paragraph\", \"text\": \"This is a paragraph.\" },\n    { \"type\": \"list\", \"items\": [\"Item 1\", \"Item 2\"] },\n    { \"type\": \"code\", \"language\": \"ts\", \"filename\": \"file.ts\", \"code\": \"console.log('code');\" }\n  ]\n}"
+    },
+    {
+      "type": "header",
+      "text": "Field Breakdown"
+    },
+    {
+      "type": "list",
+      "items": [
+        "`id` – Unique identifier for routing and linking",
+        "`title` – Blog post title",
+        "`category` – Category label (e.g. \"Dev\", \"Design\")",
+        "`date` – Publish date in YYYY-MM-DD format",
+        "`summary` – Shown on the blog list page",
+        "`content` – Array of content blocks (supports paragraph, header, list, code)"
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Blog List: Data Flow from JSON to UI"
+    },
+    {
+      "type": "paragraph",
+      "text": "This blog is data-driven: blog content lives in posts.json and gets dynamically rendered using React components."
+    },
+    {
+      "type": "header",
+      "text": "Step 1: posts.json"
+    },
+    {
+      "type": "code",
+      "language": "json",
+      "filename": "posts.json",
+      "code": "[\n  {\n    \"id\": \"dev-tools\",\n    \"title\": \"My Favorite Developer Tools\",\n    \"date\": \"2025-07-28\"\n    // ...\n  },\n  // ...\n]"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Each post is a JSON object.",
+        "You can add new posts simply by updating this file—no code changes needed."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Step 2: blog/page.tsx"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "blog/page.tsx",
+      "code": "'use client';\n\nimport { useSearchParams } from 'next/navigation';\nimport BlogCard from '../../components/BlogCard';\nimport posts from '../../data/posts.json';\n\nexport default function BlogPage() {\n  const searchParams = useSearchParams();\n  const selectedCategory = searchParams.get('category');\n\n  const filteredPosts = selectedCategory\n    ? posts.filter(post => post.category === selectedCategory)\n    : posts;\n\n  return (\n    <div>\n      {filteredPosts.map(post => (\n        <BlogCard\n          key={post.id}\n          id={post.id}\n          title={post.title}\n          date={post.date}\n        />\n      ))}\n    </div>\n  );\n}"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Imports all blog post data.",
+        "Filters posts by category if a query param is present.",
+        "Maps over the filtered array and renders a BlogCard for each one."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Step 3: BlogCard.tsx"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "BlogCard.tsx",
+      "code": "import '../styles/globals.css';\nimport Link from 'next/link';\n\ntype BlogCardProps = {\n  id: string;\n  title: string;\n  date: string;\n};\n\nexport default function BlogCard({ id, title, date }: BlogCardProps) {\n  return (\n    <div className=\"blog-card\">\n      <Link href={`/blog/${id}`}>\n        <h1 className=\"blog-title\">{title}</h1>\n      </Link>\n      <p className=\"blog-date\">{date}</p>\n    </div>\n  );\n}"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Receives `id`, `title`, and `date` from each post.",
+        "Creates a clickable link to /blog/[id], where the full post will be displayed."
+      ]
+    },
+        {
+      "type": "header",
+      "text": "Full Flow Summary"
+    },
+    {
+      "type": "paragraph",
+      "text": "posts.json → blog/page.tsx → BlogCard → /blog/[id]"
+    },
+    {
+      "type": "list",
+      "items": [
+        "All blog content lives in posts.json.",
+        "blog/page.tsx loads and optionally filters this data by category.",
+        "For each post, a BlogCard is rendered with title and date.",
+        "Each card links to a unique post detail page using the post's id."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This post shows how blog posts can be filtered by category using the URL, React hooks, and data from a JSON file. It explains how clicking a category updates the URL and filters the visible posts without reloading the page."
+    },
+    {
+      "type": "header",
+      "text": "Filtering Blog Posts by Category – blog/page.tsx"
+    },
+    {
+      "type": "paragraph",
+      "text": "This page renders a list of blog posts and adds dynamic category filtering using URL query parameters. Users can click categories in the CategoryNav component, and this page updates to show only matching posts."
+    },
+    {
+      "type": "header",
+      "text": "Updated Blog Page"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "blog/page.tsx",
+      "code": "'use client';\n\nimport { useSearchParams } from 'next/navigation';\nimport BlogCard from '../../components/BlogCard';\nimport posts from '../../data/posts.json';\n\nexport default function BlogPage() {\n  const searchParams = useSearchParams();\n  const selectedCategory = searchParams.get('category');\n\n  const filteredPosts = selectedCategory\n    ? posts.filter(post => post.category === selectedCategory)\n    : posts;\n\n  return (\n    <div>\n      <h1>Blog</h1>\n      {filteredPosts.map(post => (\n        <BlogCard\n          key={post.id}\n          id={post.id}\n          title={post.title}\n          date={post.date}\n        />\n      ))}\n    </div>\n  );\n}"
+    },
+    {
+      "type": "header",
+      "text": "Data Flow Explained"
+    },
+    {
+      "type": "list",
+      "items": [
+        "1. posts.json A static file containing all blog post data — including id, title, date, and category.",
+        "2. URL Query Param (?category=Tech) – The user selects a category using the CategoryNav, which appends a category query string to the URL.",
+        "3. useSearchParams() – Reads the query parameter from the URL (category=Tech).",
+        "4. Filtering – If a category is selected, the page filters the posts array using: posts.filter(post => post.category === selectedCategory)",
+        "5. Rendering – The filtered list is mapped into BlogCard components, each displaying a post's title and date, and linking to its full content via /blog/[id]."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This approach keeps your content decoupled from the UI, leverages client-side filtering, and makes the blog easy to scale or adapt — like adding tags or search later on."
+    },
+    {
+      "type": "header",
+      "text": "CategoryNav.tsx – Dynamic Category Navigation"
+    },
+    {
+      "type": "paragraph",
+      "text": "This component creates a dynamic list of category links based on the blog posts defined in posts.json. It allows users to filter blog posts by category directly from the UI."
+    },
+    {
+      "type": "header",
+      "text": "Key Logic"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "CategoryNav.tsx",
+      "code": "const categories = Array.from(\n  new Set(posts.map(post => post.category))\n).sort();"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Extracts the category from each post.",
+        "Uses a Set to remove duplicates.",
+        "Sorts them alphabetically for a clean UI."
+      ]
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "CategoryNav.tsx",
+      "code": "const allCategories = ['All', ...categories];"
+    },
+    {
+      "type": "paragraph",
+      "text": "Prepends an \"All\" option to show every post."
+    },
+    {
+      "type": "header",
+      "text": "🔗 Category Links"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "CategoryNav.tsx",
+      "code": "{allCategories.map(category => (\n  <Link\n    key={category}\n    href={category === 'All' ? '/blog' : `/blog?category=${category}`}\n    className=\"category-link\"\n  >\n    {category}\n  </Link>\n))}"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Each category is rendered as a Link component.",
+        "The \"All\" link routes to /blog, showing all posts.",
+        "Other categories include a query string (?category=Tech, etc.) that’s picked up by the blog page to filter posts."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Data Flow Summary"
+    },
+    {
+      "type": "list",
+      "items": [
+        "posts.json → extract categories → render links → URL updates → filtered posts",
+        "The component reads from posts.json.",
+        "It dynamically generates a list of unique categories.",
+        "Each link updates the URL, triggering filtering on the blog page."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This makes your blog’s category system fully data-driven — whenever you add a new category to a post in posts.json, it automatically appears in the navigation."
+    },
+    {
+      "type": "paragraph",
+      "text": "This file powers the individual blog post pages using Next.js App Router dynamic routing. It dynamically loads content based on the URL slug (which matches a post's id) and renders the full post including text, headers, lists, and code blocks."
+    },
+    {
+      "type": "header",
+      "text": "File Structure"
+    },
+    {
+      "type": "code",
+      "language": "text",
+      "filename": "Structure",
+      "code": "app/\n  blog/\n    [slug]/\n      page.tsx     ← This file\ndata/\n  posts.json       ← Static blog post data\nstyles/\n  globals.css      ← Global styles used across the app"
+    },
+    {
+      "type": "header",
+      "text": "Code Overview"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "page.tsx",
+      "code": "import '../../../styles/globals.css'; \nimport posts from '../../../data/posts.json';"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Imports post data from a local JSON file.",
+        "Loads global styles for consistent formatting across your blog."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Type Definitions"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "page.tsx",
+      "code": "type ParagraphBlock = { type: 'paragraph'; text: string };\ntype HeaderBlock = { type: 'header'; text: string };\ntype CodeBlock = { type: 'code'; language: string; filename: string; code: string };\ntype ListBlock = { type: 'list'; items: string[] };\n\ntype PostBlock = ParagraphBlock | HeaderBlock | CodeBlock | ListBlock;\n\ntype Post = {\n  id: string;\n  title: string;\n  category: string;\n  date: string;\n  summary: string;\n  content: PostBlock[];\n};"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Each blog post is composed of a list of PostBlocks, allowing rich and extensible content rendering.",
+        "TypeScript ensures safety and clarity across components."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Dynamic Routing via Slug"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "page.tsx",
+      "code": "type Params = {\n  params: {\n    slug: string;\n  };\n};"
+    },
+    {
+      "type": "list",
+      "items": [
+        "The slug value comes from the URL path: /blog/my-post-id.",
+        "It's matched against the id field in posts.json."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Post Lookup"
+    },
+    {
+      "type": "code",
+      "language": "ts",
+      "filename": "page.tsx",
+      "code": "const post = posts.find(p => p.id === params.slug);"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Filters the list of posts and returns the one matching the URL's slug.",
+        "Posts are assumed to be pre-loaded from static JSON."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Not Found Case"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "page.tsx",
+      "code": "if (!post) {\n  return <div>Post not found.</div>;\n}"
+    },
+    {
+      "type": "paragraph",
+      "text": "Gracefully handles cases where a post doesn't exist."
+    },
+    {
+      "type": "header",
+      "text": "Post Rendering"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "page.tsx",
+      "code": "<article className=\"blog-post\">\n  <h1 className=\"post-title\">{post.title}</h1>\n  <p className=\"post-date\">{post.date}</p>\n\n  {post.content.map((block, index) => {\n    switch (block.type) {\n      case 'header':\n        return <h1 key={index} className=\"post-header\">{block.text}</h1>;\n      case 'paragraph':\n        return <p key={index} className=\"post-paragraph\">{block.text}</p>;\n      case 'code':\n        return (\n          <div key={index} className=\"post-code-block\">\n            {block.filename ++ <div className=\"code-filename\">{block.filename}</div>}\n            <pre className=\"post-code\">\n              <code>{block.code}</code>\n            </pre>\n          </div>\n        );\n      case 'list':\n        return (\n          <ul key={index} className=\"post-list\">\n            {block.items.map((item, i) => (\n              <li key={i} className=\"post-list-item\">{item}</li>\n            ))}\n          </ul>\n        );\n      default:\n        return null;\n    }\n  })}\n</article>"
+    },
+    {
+      "type": "header",
+      "text": "Supported Block Types"
+    },
+    {
+      "type": "list",
+      "items": [
+        "`paragraph` – A standard text paragraph",
+        "`header` – A header or subheading (<h1>)",
+        "`code` – A code snippet with optional filename",
+        "`list` – A bullet list"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This makes thiis blog modular and ready for new types like images, blockquotes, embeds, etc."
+    },
+    {
+      "type": "header",
+      "text": "Data Flow Summary"
+    },
+    {
+      "type": "list",
+      "items": [
+        "URL → slug param → Find post in posts.json → Render using post blocks",
+        "User visits /blog/my-post-id.",
+        "Next.js provides the slug via params.",
+        "The component locates the correct post in posts.json.",
+        "The content blocks are rendered based on type."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This post explains how individual blog posts are rendered using dynamic routes and block-based content from a JSON file. By matching the URL to a post’s ID, the page loads and displays each section—like headers, paragraphs, code, or lists—based on its type."
+    },
+    {
+  "type": "paragraph",
+  "text": "This full guide walks through every foundational piece of this blog—from setting up the root layout and global styles, to building a responsive navigation bar, organizing content using JSON, adding dynamic category filtering, and rendering individual posts with flexible content blocks. The result is a scalable, maintainable, and fully data-driven blog built with Next.js App Router."
+}
+
+  ]
+}
+,
+{
+  "id": "font-color-preview",
+  "title": "Font and Color Pairer",
+  "category": "Design",
+  "date": "2025-07-29",
+  "summary": "A simple HTML/CSS/JS setup to preview different font and color combinations for blog design.",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "A quick and easy way to see font and color pairings."
+    },
+    {
+      "type": "header",
+      "text": "What It Does"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Shows a basic blog layout (heading, tabs, article, footer)",
+        "Lets me try different fonts for headings and body text",
+        "Lets me pick custom colors for background, text, and muted elements",
+        "Updates everything live, without reloading the page"
+      ]
+    },
+    {
+      "type": "header",
+      "text": "How It Works"
+    },
+    {
+      "type": "paragraph",
+      "text": "There’s a 'Settings' button in the bottom right corner. When clicked, it opens a panel with dropdowns and color pickers. I use JavaScript to update CSS variables based on those inputs."
+    },
+    {
+      "type": "code",
+      "language": "javascript",
+      "filename": "script.js",
+      "code": "const root = document.documentElement;\n\ndocument.getElementById('bgPicker').oninput = (e) => {\n  root.style.setProperty('--color-bg', e.target.value);\n};\n\ndocument.getElementById('textPicker').oninput = (e) => {\n  root.style.setProperty('--color-text', e.target.value);\n};\n\ndocument.getElementById('mutedPicker').oninput = (e) => {\n  root.style.setProperty('--color-muted', e.target.value);\n};\n\ndocument.getElementById('headingFontPicker').onchange = (e) => {\n  root.style.setProperty('--font-headings', e.target.value);\n};\n\ndocument.getElementById('bodyFontPicker').onchange = (e) => {\n  root.style.setProperty('--font-body', e.target.value);\n};"
+    },
+    {
+      "type": "paragraph",
+      "text": "These values are used in the CSS with var():"
+    },
+    {
+      "type": "code",
+      "language": "css",
+      "filename": "style.css",
+      "code": ":root {\n  --color-bg: #fff;\n  --color-text: #000;\n  --color-muted: #666;\n  --font-headings: 'Space Mono', monospace;\n  --font-body: monospace;\n}\n\nbody {\n  background: var(--color-bg);\n  color: var(--color-text);\n  font-family: var(--font-body);\n}\n\nh1, h2, h3 {\n  font-family: var(--font-headings);\n}"
+    },
+    {
+      "type": "header",
+      "text": "Layout"
+    },
+    {
+      "type": "paragraph",
+      "text": "The layout is kept simple: a wrapper that limits width, a heading and a list of category labels (just text for now), a sample blog article, and a footer."
+    },
+    {
+      "type": "code",
+      "language": "html",
+      "filename": "index.html",
+      "code": "<article>\n  <h1>How I Built a Blog Without JavaScript</h1>\n\n  <h2>Why No JavaScript?</h2>\n  <p>I wanted to build something fast, minimal, and accessible.</p>\n\n  <h2>Code Example</h2>\n  <pre><code>\ninput[type=\"radio\"]:checked ~ .content {\n  display: block;\n}\n  </code></pre>\n</article>"
+    },
+    {
+      "type": "header",
+      "text": "Why I Made It"
+    },
+    {
+      "type": "paragraph",
+      "text": "I didn’t want to make design choices in isolation. This lets me test:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Which fonts actually look good together in a blog context",
+        "Whether colors have enough contrast",
+        "How readable everything feels at different sizes"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "It also avoids locking anything into a system. This is just HTML/CSS/JS, so I can reuse the styles later, or scrap them and try something new."
+    }
+  ]
+},
+{
+  "id": "styling-foundation",
+  "title": "Styling Foundation with globals.css",
+  "category": "Design",
+  "date": "2025-07-29",
+  "summary": "An overview of how I use a global CSS file to define consistent styles, font loading, layout structure, and typographic rules across my blog.",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "This blog uses a global CSS file to define baseline styles across all pages. I set out a simple base layer in `How I Built the Foundation for This Blog #1: Root Layout + Global Styles`. Now I will add more basic styling."
+    },
+    {
+      "type": "header",
+      "text": "Font"
+    },
+    {
+      "type": "paragraph",
+      "text": "I have decided to use Ubuntu as my main font. Monospace font's characters have fixed width preventing unwanted side effects."
+    },
+    {
+      "type": "header",
+      "text": "CSS Variables"
+    },
+    {
+      "type": "code",
+      "language": "css",
+      "filename": "globals.css",
+      "code": ":root {\n  --background: #FFF;\n  --foreground: #333;\n  --lightgrey: #EEE;\n  --mediumgrey: #666;\n  --font-inter: 'Ubuntu', sans-serif;\n}"
+    },
+    {
+      "type": "paragraph",
+      "text": "These root variables control key colors and fonts. They make it easier to maintain theme consistency and adapt to dark mode or other style variants later."
+    },
+    {
+      "type": "header",
+      "text": "Base Styling"
+    },
+    {
+      "type": "code",
+      "language": "css",
+      "filename": "globals.css",
+      "code": "html, body {\n  height: 100%;\n  overflow: hidden;\n  font-size: 16px;\n}\n\nbody {\n  overflow-y: auto;\n  color: var(--foreground);\n  background: var(--background);\n  font-family: var(--font-inter), sans-serif;\n  -webkit-font-smoothing: antialiased;\n}\n\na {\n  color: inherit;\n  text-decoration: none;\n}"
+    },
+    {
+      "type": "paragraph",
+      "text": "Global defaults include font smoothing, standard text sizing, vertical scroll, and consistent background and text colors."
+    },
+    {
+      "type": "header",
+      "text": "Typographic Choices"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Font sizes are chosen for clarity and scale: 16px base font size for body text, 18px for blog titles, 32px for full post titles",
+        "Line height is generally set between 1.5 and 1.6 for readability, especially for paragraphs and lists.",
+        "Letter-spacing is changed slightly (e.g. between -0.02em and 0.02em) to improve visual balance",
+        "Blog text and metadata use lighter colors (e.g. var(--mediumgrey)) to reduce contrast against bold headers and titles."
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Layout and Structure"
+    },
+    {
+      "type": "list",
+      "items": [
+        ".main-body: Adds padding and applies global font",
+        ".site-header: Adds spacing below the page header",
+        ".site-title: Controls size, spacing, and typographic polish"
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Navbar and Category Styles"
+    },
+    {
+      "type": "list",
+      "items": [
+        ".navbar-list: Flex layout with spacing and no bullets",
+        ".navbar-link: Small, clean links with underline and active state",
+        ".category-nav: Flexible category filter with horizontal wrapping",
+        ".category-link; Styled as pills with borders and spacing"
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Blog Cards and Post Content"
+    },
+    {
+      "type": "list",
+      "items": [
+        ".blog-card: Adds spacing and a top border",
+        ".blog-title: Adjusts size and spacing for entry titles",
+        ".post-title: Larger font for detailed view",
+        ".post-paragraph, .post-date, .post-header: Styled with margins and accent colors"
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Bullet Lists and Code Blocks"
+    },
+    {
+      "type": "list",
+      "items": [
+        ".post-list: Applies disc bullets, indentation, and spacing",
+        ".post-list-item: Margins and readable line height",
+        ".post-code: Light background, monospaced font, horizontal scroll",
+        ".code-filename: Filename label above code blocks"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "These styles give the blog consistent typography, layout spacing, and structure without relying on external libraries or frameworks."
+    }
+  ]
+},
+{
+  "id": "theme-toggle",
+  "title": "Adding a Dark Mode Toggle to My Blog",
+  "category": "Development",
+  "date": "2025-07-30",
+  "summary": "How I added a light/dark mode toggle using CSS variables, a React button, and no extra dependencies.",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "I wanted readers to switch between light and dark themes while keeping the code minimal, fast, and fully in my control. Here's how I added a custom theme toggle button to my blog using plain CSS variables and a small React component."
+    },
+    {
+      "type": "header",
+      "text": "CSS Variables for Light and Dark"
+    },
+    {
+      "type": "code",
+      "language": "css",
+      "filename": "globals.css",
+      "code": ":root {\n  --background: #FFF;\n  --foreground: #333;\n  --white: #EEE;\n  --accent: #666;\n}\n\nhtml.dark {\n  --background: #111;\n  --foreground: #f5f5f5;\n  --white: #333;\n  --accent: #aaa;\n}"
+    },
+    {
+      "type": "paragraph",
+      "text": "Using a `.dark` class on the `<html>` element lets me switch all colors using just CSS variables. This makes it easy to theme the entire blog without touching multiple selectors."
+    },
+    {
+      "type": "header",
+      "text": "React Toggle Button"
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "ThemeToggle.tsx",
+      "code": "import { useEffect, useState } from 'react';\nimport { Sun, Moon } from 'lucide-react';\n\nexport default function ThemeToggle() {\n  const [dark, setDark] = useState(false);\n\n  useEffect(() => {\n    const root = document.documentElement;\n    if (dark) {\n      root.classList.add('dark');\n    } else {\n      root.classList.remove('dark');\n    }\n  }, [dark]);\n\n  return (\n    <button className=\"theme-toggle-button\" onClick={() => setDark(!dark)}>\n      {dark ? <Moon size={18} /> : <Sun size={18} />}\n    </button>\n  );\n}"
+    },
+    {
+      "type": "paragraph",
+      "text": "This button toggles a `.dark` class on the `<html>` element, which controls the theme through CSS variables. The icon switches between sun and moon using Lucide icons."
+    },
+    {
+      "type": "header",
+      "text": "Styling the Button"
+    },
+    {
+      "type": "code",
+      "language": "css",
+      "filename": "globals.css",
+      "code": ".theme-toggle-button {\n  position: fixed;\n  top: 1rem;\n  right: 1.5rem;\n  padding: 0.5rem;\n  border: none;\n  border-radius: 50%;\n  background: transparent;\n  cursor: pointer;\n  z-index: 1000;\n  color: var(--foreground);\n}"
+    },
+    {
+      "type": "paragraph",
+      "text": "I placed the button in the top-right corner using `position: fixed`, but I can easily drop it into my Navbar if I want it inline with the rest of the header."
+    },
+    {
+      "type": "header",
+      "text": "Why This Works"
+    },
+    {
+      "type": "list",
+      "items": [
+        "CSS variables make the theme lightweight and scalable",
+        "No reloading or external libraries required",
+        "The toggle is accessible, keyboard-friendly, and responsive",
+        "I can style and position the button however I like"
+      ]
+    }
+  ]
+},
+{
+  "id": "gsap-animations",
+  "title": "Animating Blog Cards and Posts with GSAP",
+  "category": "Development",
+  "date": "2025-07-30",
+  "summary": "How I used GSAP to animate blog cards on category filter and full blog posts on page load.",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "This post explains how I used the GSAP animation library to bring motion to my blog. I focused on two parts: blog cards that animate in when filtering by category, and full blog posts that animate when loaded."
+    },
+    {
+      "type": "header",
+      "text": "Why GSAP?"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Smooth animations that are easy to configure",
+        "Precise control over timing, easing, and stagger effects",
+        "Works well with React when used inside useEffect"
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Blog Card Animation on Filter"
+    },
+    {
+      "type": "paragraph",
+      "text": "Each time the user selects a category, I filter the list of blog cards and animate them in using GSAP. I use a ref to the container and animate each child as it appears."
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "BlogPage.tsx",
+      "code": "const listRef = useRef<HTMLDivElement | null>(null);\n\nuseEffect(() => {\n  if (listRef.current) {\n    gsap.fromTo(\n      listRef.current.children,\n      { opacity: 0, y: 30 },\n      {\n        opacity: 1,\n        y: 0,\n        stagger: 0.1,\n        duration: 0.4,\n        ease: 'power2.out'\n      }\n    );\n  }\n}, [filteredPosts]);"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Cards fade in and slide up",
+        "Staggered delay makes each card appear one-by-one",
+        "Effect re-runs whenever the filteredPosts array changes"
+      ]
+    },
+    {
+      "type": "header",
+      "text": "Full Blog Post Animation"
+    },
+    {
+      "type": "paragraph",
+      "text": "When a user clicks on a blog card and navigates to a full post, I animate the post content as it loads. The animation is triggered once on page mount."
+    },
+    {
+      "type": "code",
+      "language": "tsx",
+      "filename": "BlogPostContent.tsx",
+      "code": "const postRef = useRef<HTMLElement | null>(null);\n\nuseEffect(() => {\n  if (postRef.current) {\n    gsap.fromTo(\n      postRef.current.children,\n      { opacity: 0, y: 30 },\n      {\n        opacity: 1,\n        y: 0,\n        stagger: 0.15,\n        duration: 0.5,\n        ease: 'power2.out'\n      }\n    );\n  }\n}, []);"
+    },
+    {
+      "type": "list",
+      "items": [
+        "All post blocks (title, date, paragraphs, etc.) animate together",
+        "Uses a React ref and runs inside a client-side useEffect",
+        "Post animation only runs once on initial mount"
+      ]
+    },
+    {
+      "type": "header",
+      "text": "What I Learned"
+    },
+    {
+      "type": "list",
+      "items": [
+        "GSAP works well with React as long as you use refs",
+        "Staggered animations add a lot of visual polish",
+        "Only animate inside useEffect and useRef — no direct DOM access",
+        "It’s important to track when a component mounts vs. when it just becomes visible"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "GSAP gave my blog motion without overcomplicating my code. I started small by animating the blog cards and post pages, and I plan to explore scroll-based or hover-triggered animations next."
+    }
+  ]
+}
+
+
+
+
+]
