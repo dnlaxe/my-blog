@@ -35,7 +35,6 @@ type Post = {
   content: PostBlock[];
 };
 
-// ✅ CORRECT FUNCTION SIGNATURE FOR APP ROUTER
 export default async function BlogPostPage({
   params,
 }: {
