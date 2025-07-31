@@ -1,13 +1,6 @@
-import { notFound } from 'next/navigation';
 import '../../../styles/globals.css';
 import posts from '../../../data/posts.json';
 import BlogPostContent from '../../../components/BlogPostContent';
-
-type ParagraphBlock = { type: 'paragraph'; text: string };
-type HeaderBlock = { type: 'header'; text: string };
-type CodeBlock = { type: 'code'; language: string; filename?: string; code: string };
-type ListBlock = { type: 'list'; items?: string[] };
-type PostBlock = ParagraphBlock | HeaderBlock | CodeBlock | ListBlock;
 
 type Post = {
   id: string;
@@ -15,23 +8,23 @@ type Post = {
   category: string;
   date: string;
   summary: string;
-  content: PostBlock[];
+  content: (
+    | { type: 'paragraph'; text: string }
+    | { type: 'header'; text: string }
+    | { type: 'code'; language: string; filename?: string; code: string }
+    | { type: 'list'; items?: string[] }
+  )[];
 };
 
-export async function generateStaticParams() {
-  return posts.map((post) => ({ slug: post.id }));
-}
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const post = posts.find((p) => p.id === slug) as Post | undefined;
 
-interface RouteParams {
-  params: {
-    slug: string;
-  };
-}
-
-export default function BlogPostPage({ params }: RouteParams) {
-  const post = posts.find((p) => p.id === params.slug) as Post | undefined;
-
-  if (!post) notFound();
+  if (!post) return <div>Post not found.</div>;
 
   return (
     <BlogPostContent
@@ -45,10 +38,10 @@ export default function BlogPostPage({ params }: RouteParams) {
             return <p key={index}>{block.text}</p>;
           case 'code':
             return (
-              <div key={index}>
+              <pre key={index}>
                 {block.filename && <div>{block.filename}</div>}
-                <pre><code>{block.code}</code></pre>
-              </div>
+                <code>{block.code}</code>
+              </pre>
             );
           case 'list':
             return (
@@ -64,4 +57,10 @@ export default function BlogPostPage({ params }: RouteParams) {
       })}
     />
   );
+}
+
+export async function generateStaticParams() {
+  return posts.map((post) => ({
+    slug: post.id,
+  }));
 }
