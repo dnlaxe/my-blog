@@ -35,7 +35,7 @@ type Post = {
   content: PostBlock[];
 };
 
-export default async function BlogPostPage({
+export default async function Page({
   params,
 }: {
   params: { slug: string };
