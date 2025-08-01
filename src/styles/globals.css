@@ -219,7 +219,7 @@ p {
 .post-date {
   color: var(--mediumgrey);
   font-size: 0.875rem; /* Approx 14px */
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 3rem !important;
   margin-top: 0.5rem;
   letter-spacing: 0.02em;
 }
